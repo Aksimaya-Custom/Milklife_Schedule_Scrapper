@@ -15,5 +15,6 @@ class FileHandler:
                 return True
             except Exception as e:
                 print("Error Occurred on checkFolder function at fileFolderHandler\ndetails: ", e)
+                raise
         else:
             return True
