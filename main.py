@@ -31,9 +31,9 @@ with sync_playwright() as pw:
     if not os.path.exists('./auth.json'):
         page.goto('https://admin.milklifesoccer.com/#/aksimayaAuth/login')
         sleep(2)
-        page.get_by_placeholder("Username").fill( os.getenv('USERNAME') )
+        page.get_by_placeholder("Username").fill( os.getenv('ML_USER') )
         sleep(1)
-        page.get_by_placeholder("Password").fill( os.getenv('PASSWORD') )
+        page.get_by_placeholder("Password").fill( os.getenv('ML_PASSWORD') )
         sleep(1)
         page.get_by_role("button", name="Log in").click()
         sleep(3)
