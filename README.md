@@ -7,7 +7,8 @@
    </div>
 </div>
 
-
+## About this Project
+This project is pythonic-scrapper for Milklife Soccer Match Schedule, and generate the output as CSV file
 
 ## Tech Stacks
 
