@@ -35,7 +35,15 @@ class ExtractData(Tools, FileHandler):
         data = dataBeforeTrim.replace(separ, '', -1)
         return data.strip()
 
-    def extractToCsv(self, data: str = "", name: str = ""):
-        # if self.checkFolder('data/' + data):
-        with open("data/{n}.csv".format(n = name), "w+") as file1:
-            file1.write(data)
+    def extractToCsv(self, data: str = "", date: str = "", cat: str = "U10", typed: str = "FG", name: str = ""):
+        try:
+            endpointFile = 'data/' + "{n}/".format(n = date) + "{c}/".format(c = cat) + typed
+            self.checkAndCreateIfNotExists( 'data' )
+            self.checkAndCreateIfNotExists( 'data/' + date )
+            self.checkAndCreateIfNotExists( 'data/' + "{n}/".format(n = date) + cat )
+            self.checkAndCreateIfNotExists( endpointFile )
+            with open("{e}/{n}.csv".format(e = endpointFile, n = name), "w+") as file1:
+                file1.write(data)
+        except Exception as e:
+            print("Error Occurred when check and creating folder or file, please check permission.")
+            raise

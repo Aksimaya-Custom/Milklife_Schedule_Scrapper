@@ -88,7 +88,7 @@ with sync_playwright() as pw:
                 else:
                     data += ",{t},{d},{t1},{t2},{r}".format( t = extractFunc.extractTime(totalData.nth(nRow).locator('td').nth(2).inner_text()), d = extractFunc.extractDraw(totalData.nth(nRow).locator('td').nth(4).inner_text(), cat + " "), t1 = extractFunc.extractPlayers(totalData.nth(nRow).locator('td').nth(7).inner_text(), " " + cat), t2 = extractFunc.extractPlayers(totalData.nth(nRow).locator('td').nth(9).inner_text(), " " + cat), r = extractFunc.cap(totalData.nth(nRow).locator('td').nth(11).inner_text()) )
             print("\n\n",data)
-            extractFunc.extractToCsv(data, '{t}_{c}_{dt}_{r}'.format(t = typed, c = cat, dt = date, r = row))
+            extractFunc.extractToCsv(data, date, cat, typed, "{d}_{c}_{t}_{l}".format( d = date, c = cat, t = typed, l = row ))
 
     elif typed == 'FG':
         loopStepper = extractFunc.stepper(totalData.count(), 4)
@@ -107,7 +107,7 @@ with sync_playwright() as pw:
                 else:
                     data += ",{t},{c},{l},{t1},{t2},{g}".format( t = extractFunc.extractTime(totalData.nth(nRow).locator('td').nth(2).inner_text()), c = totalData.nth(nRow).locator('td').nth(0).inner_text(), l = 'REN-{i}'.format(i = loc_i) if loc == 'RENDENG' else 'SSA-{i}'.format(i = loc_i), t1 = extractFunc.extractPlayersFG(totalData.nth(nRow).locator('td').nth(7).inner_text(), " " + cat), t2 = extractFunc.extractPlayersFG(totalData.nth(nRow).locator('td').nth(9).inner_text(), " " + cat), g = totalData.nth(nRow).locator('td').nth(5).inner_text() )
             print("\n\n",data)
-            extractFunc.extractToCsv(data, '{t}_{c}_{dt}_{r}'.format(t = typed, c = cat, dt = date, r = row))
+            extractFunc.extractToCsv(data, date, cat, typed, "{d}_{c}_{t}_{l}".format( d = date, c = cat, t = typed, l = row ))
     else:
         sys.exit(1)
 
