@@ -16,6 +16,7 @@ This project is pythonic-scrapper for Milklife Soccer Match Schedule, and genera
 In this project im using:
 - Anaconda 23.11.0 [Download](https://www.anaconda.com/download)
 - Python 3.10 [Download](https://www.python.org/downloads)
+- Playwright 1.41.2 [Documentation](https://playwright.dev/python/docs/intro)
 
 ## Setup
 - Clone this repo
