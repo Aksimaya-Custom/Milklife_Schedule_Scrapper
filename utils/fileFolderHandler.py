@@ -1,6 +1,5 @@
-# Copyright (c) 2023, Kuronekosan
+# Copyright (c) 2024, Kuronekosan
 # This version is still alpha-release
-#------------------- THIS FEATURE IS STILL ON DEVELOPMENT -------------------#
 
 import os
 import sys

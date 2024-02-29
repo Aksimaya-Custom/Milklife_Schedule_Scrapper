@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Kuronekosan
+# Copyright (c) 2024, Kuronekosan
 # This version is still alpha-release
 
 import os
