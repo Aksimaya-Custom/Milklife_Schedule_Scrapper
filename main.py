@@ -16,8 +16,8 @@ if not ( os.getenv('ML_USER') and os.getenv('ML_PASSWORD') ):
 
 extractFunc = ExtractData()
 date = input('DATE (Format: YYYY-MM-DD): ')
-cat = input('\nCATEGORY (Format: All/U10/U12): ')
-typed = input('\nTYPE (Format: All/T/FG/SC): ')
+cat = input('\nCATEGORY (Format: U10/U12): ')
+typed = input('\nTYPE (Format: T/FG/SC): ')
 
 if cat not in ['U10', 'U12'] or typed not in ['T', 'FG', 'SC']:
     print("This feature is not developed yet.")
@@ -58,11 +58,11 @@ with sync_playwright() as pw:
     pw.selectors.set_test_id_attribute("ng-model")
     page.get_by_test_id("vm.adv.plandate").select_option(value='{v}'.format(v = date))
     sleep(1)
-    pw.selectors.set_test_id_attribute("ng-model")
+    # pw.selectors.set_test_id_attribute("ng-model")
     page.get_by_test_id("vm.adv.kategori").select_option(value='{v}'.format(v = 'U10' if cat == 'U10' else 'U12' if cat == 'U12' else 'Semua'))
     sleep(1)
-    pw.selectors.set_test_id_attribute("ng-model")
-    page.get_by_test_id("vm.adv.draw_type").select_option(value='{v}'.format(v = 'Tournament' if typed == 'T' else 'Fase Group' if typed == 'FG' else 'Skill Challenge' if typed == 'SC' else 'All'))
+    # pw.selectors.set_test_id_attribute("ng-model")
+    page.get_by_test_id("vm.adv.draw_type").select_option(value='{v}'.format(v = '1' if typed == 'T' else '2' if typed == 'FG' else '3' if typed == 'SC' else 'All'))
     sleep(7)
     pw.selectors.set_test_id_attribute("ng-repeat")
     totalData = page.get_by_test_id("row in vm.tableSvc.datas | filter:vm.filterKey")
@@ -78,7 +78,7 @@ with sync_playwright() as pw:
             data = ""
             lFirst = loopStepper[row]['first']
             lLast = loopStepper[row]['last']
-            loc = extractFunc.cap( totalData.nth(3).locator('td').nth(1).inner_text().split('-',1)[0] )
+            loc = extractFunc.cap( totalData.nth(0).locator('td').nth(1).inner_text().split('-',1)[0] )
             title = "{t} - {l} {c},{d}".format(t = 'SKILL CHALLENGE' if typed == 'SC' else '7 x 7' if typed == 'FG' else 'TOURNAMENT', l = loc, c = cat, d = extractFunc.extractDate(date, 1))
             
             for nRow in range(lFirst, lLast+1):
@@ -97,7 +97,7 @@ with sync_playwright() as pw:
             data = ""
             lFirst = loopStepper[row]['first']
             lLast = loopStepper[row]['last']
-            loc = extractFunc.cap( totalData.nth(3).locator('td').nth(1).inner_text().split('-',1)[0] )
+            loc = extractFunc.cap( totalData.nth(0).locator('td').nth(1).inner_text().split('-',1)[0] )
             title = "{t} - {l} {c},{d}".format(t = 'SKILL CHALLENGE' if typed == 'SC' else '7 x 7' if typed == 'FG' else 'TOURNAMENT', l = loc, c = cat, d = extractFunc.extractDate(date, 1))
 
             for nRow in range(lFirst, lLast+1):
@@ -109,6 +109,35 @@ with sync_playwright() as pw:
             print("\n\n",data)
             extractFunc.extractToCsv(data, date, cat, typed, "{d}_{c}_{t}_{l}".format( d = date, c = cat, t = typed, l = row ))
     else:
-        sys.exit(1)
+        semiFinal = totalData.filter(has = page.get_by_role("cell", name="SF"))
+        semiFinalLoc, semiFinalLoc_i = extractFunc.cap( semiFinal.nth(0).locator('td').nth(1).inner_text() ).split('-')
+        semiFinalTitle = "{t} - {l} {c},{d}".format( t = 'SEMI FINAL', l = semiFinalLoc, c = cat, d = extractFunc.extractDate(date, 1))
+
+        final = totalData.filter(has = page.get_by_role("cell", name="Final"))
+        finalLoc, finalLoc_i = extractFunc.cap( final.nth(0).locator('td').nth(1).inner_text() ).split('-')
+        finalTitle = "{t} - {l} {c},{d}".format( t = 'FINAL', l = finalLoc, c = cat, d = extractFunc.extractDate(date, 1))
+        data = ""
+
+        for row in range( semiFinal.count() ):
+
+            if row == 0:
+                data += "{titl},{t},{c},{l},{t1},{t2}".format( titl = semiFinalTitle, t = extractFunc.extractTime(semiFinal.nth(row).locator('td').nth(2).inner_text()), c = semiFinal.nth(row).locator('td').nth(6).inner_text().replace('#', '', -1), l = 'REN-{i}'.format(i = semiFinalLoc_i) if semiFinalLoc == 'RENDENG' else 'SSA-{i}'.format(i = semiFinalLoc_i), t1 = extractFunc.extractPlayersFG(semiFinal.nth(row).locator('td').nth(7).inner_text(), " " + cat), t2 = extractFunc.extractPlayersFG(semiFinal.nth(row).locator('td').nth(9).inner_text(), " " + cat) )
+            else:
+                data += ",{t},{c},{l},{t1},{t2}".format( t = extractFunc.extractTime(semiFinal.nth(row).locator('td').nth(2).inner_text()), c = semiFinal.nth(row).locator('td').nth(6).inner_text().replace('#', '', -1), l = 'REN-{i}'.format(i = semiFinalLoc_i) if semiFinalLoc == 'RENDENG' else 'SSA-{i}'.format(i = semiFinalLoc_i), t1 = extractFunc.extractPlayersFG(semiFinal.nth(row).locator('td').nth(7).inner_text(), " " + cat), t2 = extractFunc.extractPlayersFG(semiFinal.nth(row).locator('td').nth(9).inner_text(), " " + cat) )
+
+        print("Data: ", data)
+        extractFunc.extractToCsv(data, date, cat, typed, "{d}_{c}_{t}_{l}_SF".format( d = date, c = cat, t = typed, l = row ))
+        data = ""
+
+        for row in range( final.count() ):
+
+            if row == 0:
+                data += "{titl},{t},{c},{l},{t1},{t2}".format( titl = finalTitle, t = extractFunc.extractTime(final.nth(row).locator('td').nth(2).inner_text()), c = final.nth(row).locator('td').nth(6).inner_text().replace('#', '', -1), l = 'REN-{i}'.format(i = finalLoc_i) if semiFinalLoc == 'RENDENG' else 'SSA-{i}'.format(i = finalLoc_i), t1 = extractFunc.extractPlayersFG(final.nth(row).locator('td').nth(7).inner_text(), " " + cat), t2 = extractFunc.extractPlayersFG(final.nth(row).locator('td').nth(9).inner_text(), " " + cat) )
+            else:
+                data += ",{t},{c},{l},{t1},{t2}".format( t = extractFunc.extractTime(final.nth(row).locator('td').nth(2).inner_text()), c = final.nth(row).locator('td').nth(6).inner_text().replace('#', '', -1), l = 'REN-{i}'.format(i = finalLoc_i) if semiFinalLoc == 'RENDENG' else 'SSA-{i}'.format(i = finalLoc_i), t1 = extractFunc.extractPlayersFG(final.nth(row).locator('td').nth(7).inner_text(), " " + cat), t2 = extractFunc.extractPlayersFG(final.nth(row).locator('td').nth(9).inner_text(), " " + cat) )
+
+
+        print("Data: ", data)
+        extractFunc.extractToCsv(data, date, cat, typed, "{d}_{c}_{t}_{l}_FINAL".format( d = date, c = cat, t = typed, l = row ))
 
     sleep(5)
